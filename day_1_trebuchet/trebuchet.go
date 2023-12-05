@@ -7,12 +7,13 @@ import (
 	"log/slog"
 	"os"
 	"regexp"
+	"runtime"
 	"strconv"
 	"sync"
 )
 
 func main() {
-	lines := make(chan string, 20)
+	lines := make(chan string, runtime.NumCPU())
 	calibrationValues := make(chan int, 10000)
 	var wg sync.WaitGroup
 	var waitForSum sync.WaitGroup

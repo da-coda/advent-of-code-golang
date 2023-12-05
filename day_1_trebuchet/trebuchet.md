@@ -15,7 +15,8 @@ ___
 Sure, I could just read in the whole file and iterate over it in go. But files can become large and I have to
 calculate the calibration values line by line anyway. So instead I just open the file, read a line, throw this line into 
 a channel and then read the next line. After difficult calculations and absolutely scientific decision-making I came up 
-with a channel size of 20. 
+with a channel size of 20. (Add.: In the end I decided to use the runtime.NumCPU() function to decide how many workers
+I will spawn)
 
 # Calculating the calibration values
 ___
