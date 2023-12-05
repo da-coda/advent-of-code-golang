@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
+	"advent-of-code-golang/common"
 	"fmt"
-	"log"
-	"log/slog"
 	_ "net/http/pprof"
 	"os"
 	"regexp"
@@ -57,26 +55,10 @@ func runAsWorkerPool(path string) int {
 }
 
 func readCalibrationDocument(ch chan<- string, path string) {
-	file, err := os.Open(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			slog.Error(err.Error())
-		}
-	}(file)
-	defer close(ch)
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		ch <- scanner.Text()
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
+	common.ReadFile(path, func(s string) {
+		ch <- s
+	})
+	close(ch)
 }
 
 func calcCalibrationValue(line string, ch chan<- int, wg *sync.WaitGroup) {

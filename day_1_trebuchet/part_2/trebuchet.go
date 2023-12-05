@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
+	"advent-of-code-golang/common"
 	"fmt"
-	"log"
-	"log/slog"
 	_ "net/http/pprof"
 	"os"
 	"strconv"
@@ -16,28 +14,11 @@ func main() {
 }
 
 func run(path string) int {
-	file, err := os.Open(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			slog.Error(err.Error())
-		}
-	}(file)
-
 	sum := 0
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		text := scanner.Text()
-		value := calcCalibrationValue(text)
+	common.ReadFile(path, func(s string) {
+		value := calcCalibrationValue(s)
 		sum += value
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
+	})
 	return sum
 }
 
