@@ -35,6 +35,13 @@ consumes the calibration value channel and adds the values up. Why do we do this
 its addition magic, the main thread waits for the last few calculation goroutines to finish up and close the channel behind them.
 The closing of the channel is the signal for our sum up goroutine to stop the consumption and to print the result.
 
+# But this is overkill!
+___
+I know. And I am not really sure if this task even benefits from goroutines. 
+But as I mentioned in the beginning I did not do it this way because I think that it is the best way,
+but because I really wanted to play around with Goroutines and learn a bit more about them. And one main take away I got 
+is that I need to get a better understanding about concurrency, parallelism and when to use them.
+
 # Final thoughts
 ___ 
 I really liked the task. Especially as the first task of the AOC. And I obviously fucked up my channels and goroutines more

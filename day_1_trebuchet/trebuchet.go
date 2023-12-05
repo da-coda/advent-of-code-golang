@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"regexp"
 	"strconv"
@@ -12,8 +13,9 @@ import (
 
 func main() {
 	lines := make(chan string, 20)
-	calibrationValues := make(chan int, 20)
+	calibrationValues := make(chan int, 10000)
 	var wg sync.WaitGroup
+	var waitForSum sync.WaitGroup
 	go readCalibrationDocument(lines)
 	for line := range lines {
 		if line == "\n" {
@@ -22,17 +24,24 @@ func main() {
 		wg.Add(1)
 		go calcCalibrationValue(line, calibrationValues, &wg)
 	}
-	go collectValues(calibrationValues)
+	waitForSum.Add(1)
+	go collectValues(calibrationValues, &waitForSum)
 	wg.Wait()
 	close(calibrationValues)
+	waitForSum.Wait()
 }
 
 func readCalibrationDocument(ch chan<- string) {
-	file, err := os.Open("day_1_1_trebuchet/calibration_document.txt")
+	file, err := os.Open("day_1_trebuchet/calibration_document.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			slog.Error(err.Error())
+		}
+	}(file)
 	defer close(ch)
 
 	scanner := bufio.NewScanner(file)
@@ -56,10 +65,11 @@ func calcCalibrationValue(line string, ch chan<- int, wg *sync.WaitGroup) {
 	ch <- num
 }
 
-func collectValues(ch <-chan int) {
+func collectValues(ch <-chan int, wg *sync.WaitGroup) {
 	sum := 0
 	for calibrationValue := range ch {
 		sum += calibrationValue
 	}
 	fmt.Println(sum)
+	wg.Done()
 }
